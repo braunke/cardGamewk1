@@ -18,45 +18,90 @@ nine = Card(9, 'Nine')
 ten = Card(10, "Ten")
 ace = Card(1, "Ace")
 
-#class BlackjackGame(object):
+class BlackjackGame(object):
 
-#function to keep score
-def keepScore (card, userTotal):
-    cardTotal = cardDrawn.cardValue
-    userTotal += cardTotal
-    return userTotal
+    #creates deck of cards
+    def __init__(self):
+        cards = [jack, queen, two, three, four, five, six, seven, eight, nine, ten, ace]
+        self.cardDeck = cards + cards + cards + cards
+        self.userCards = []
+        self.dealerCards = []
+        self.gameOver = False
 
+    def deal(self):
+       shuffle(self.cardDeck)
+       self.userCards.extend([self.cardDeck.pop(), self.cardDeck.pop()])
+       self.dealerCards.extend([self.cardDeck.pop(), self.cardDeck.pop()])
 
-cards = [jack, queen, two, three, four, five, six, seven, eight, nine, ten, ace]
-cardDeck = cards + cards + cards + cards
-shuffle(cardDeck)
-userTotal = 0
-x = 0
-#gets the first two cards laid down for the player
-while (x < 2):
-    cardDrawn = cardDeck.pop()
-    print (cardDrawn.name)
-    userTotal = keepScore(cardDrawn, userTotal)
-    x = x + 1
-dealerTotal = 0
+    # function to calculate score from a hand of cards
+    def getScore (self, cards):
+        score = 0
+        for card in cards:
+            score += card.cardValue
+        return score
 
-cardDrawn = cardDeck.pop()
-print ('One of the dealers cards is a' , cardDrawn.name)
-dealerTotal = keepScore(cardDrawn, dealerTotal)
-cardDrawn = cardDeck.pop()
-hiddenCard = cardDrawn.name
-dealerTotal = keepScore(cardDrawn, dealerTotal)
+    def getUserScore (self):
+        return self.getScore(self.userCards)
 
-print('Your total is' , userTotal)
-if userTotal == 21:
+    def getDealerScore (self):
+        return self.getScore(self.dealerCards)
+
+    def getCards (self, cards, showHidden):
+        cardList = ""
+        for idx, card in enumerate(cards):
+            if (showHidden == False and idx == 1):
+                cardList += "Hidden"
+            else:
+                cardList += card.name
+        return cardList
+
+    def getUserCards (self):
+        return self.getCards(self.userCards, True)
+
+    def getDealerCards (self):
+        return self.getCards(self.dealerCards, self.gameOver)
+    def hit(self):
+        card = self.cardDeck.pop()
+        self.userCards.append(card)
+        return card.name
+    def stay(self):
+        dealerTotal = self.getDealerScore()
+        if dealerTotal < 17:
+            dealerPlay = "G"
+            while dealerPlay == "G":
+                cardDrawn = self.cardDeck.pop()
+                print("Dealer played a", cardDrawn.name)
+                self.dealerCards.append(cardDrawn)
+                dealerTotal = self.getDealerScore()
+                if dealerTotal > 21:
+                    print("Dealer Bust")
+                    dealerPlay = "X"
+                elif dealerTotal > 17:
+                    print("Dealer total is", dealerTotal)
+                    dealerPlay = "X"
+                elif dealerTotal == 21:
+                    print("Dealer blackjack")
+                    dealerPlay = "X"
+        elif dealerTotal > 17:
+            print('The dealers total is', dealerTotal)
+        elif dealerTotal == 21:
+            print('Dealer BlackJack')
+
+game = BlackjackGame()
+game.deal()
+print ('The dealer has ' , game.getDealerCards())
+
+print('Your cards:', game.getUserCards())
+print('Your total is' , game.getUserScore())
+if game.getUserScore() == 21:
     print('Blackjack')
 print("Do you want to hit or stay?(H/S)")
 play = input().upper()
 #player playing
 while play == 'H':
-    cardDrawn = cardDeck.pop()
-    print("You drew a ", cardDrawn.name)
-    userTotal = keepScore(cardDrawn, userTotal)
+    cardDrawn = game.hit()
+    print("You drew a ", cardDrawn)
+    userTotal = game.getUserScore()
     print("Total is", userTotal)
     if userTotal < 21:
         play = input('Do you want to hit or stay?(H/S)')
@@ -66,32 +111,10 @@ while play == 'H':
     elif userTotal > 21:
         print('bust! Game Over')
         play = "x"
-    if play == "S":
-        print('Your total is', userTotal)
-        print('Now it is the dealers turn')
-if play == "S":
-    print('Your total is', userTotal)
-    print('Now it is the dealers turn')
-#dealer playing
-print('The dealers hidden card is a', hiddenCard)
-if dealerTotal < 17:
-    dealerPlay = "G"
-    while dealerPlay == "G":
-        cardDrawn = cardDeck.pop()
-        print("Dealer played a", cardDrawn.name)
-        dealerTotal = keepScore(cardDrawn, dealerTotal)
-        if dealerTotal > 21:
-            print("Dealer Bust")
-            dealerPlay = "X"
-        elif dealerTotal > 17:
-            print("Dealer total is", dealerTotal)
-            dealerPlay = "X"
-        elif dealerTotal ==21:
-            print("Dealer blackjack")
-            dealerPlay = "X"
-elif dealerTotal > 17:
 
-    print('The dealers total is', dealerTotal)
-elif dealerTotal == 21:
-    print('Dealer BlackJack')
+if play == "S":
+    print('Your total is', game.getUserScore())
+    print('Now it is the dealers turn')
+    game.stay()
+
 #determine who wins
