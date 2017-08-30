@@ -65,6 +65,9 @@ class BlackjackGame(object):
         self.userCards.append(card)
         return card.name
     def stay(self):
+        self.gameOver = True
+        dealerCards = self.getDealerCards()
+        print("So far the dealer has" , dealerCards)
         dealerTotal = self.getDealerScore()
         if dealerTotal < 17:
             dealerPlay = "G"
@@ -75,26 +78,56 @@ class BlackjackGame(object):
                 dealerTotal = self.getDealerScore()
                 if dealerTotal > 21:
                     print("Dealer Bust")
+                    print('You win')
+                    self.recordWinningScores()
                     dealerPlay = "X"
                 elif dealerTotal > 17:
                     print("Dealer total is", dealerTotal)
                     dealerPlay = "X"
-                elif dealerTotal == 21:
-                    print("Dealer blackjack")
-                    dealerPlay = "X"
+                    self.winner()
+
         elif dealerTotal > 17:
             print('The dealers total is', dealerTotal)
+            self.winner()
         elif dealerTotal == 21:
             print('Dealer BlackJack')
-
+            self.winner()
+    def winner(self):
+        dealerTotal = self.getDealerScore()
+        userTotal = self.getUserScore()
+        if dealerTotal == 21:
+            print(" Blackjack")
+            if userTotal == 21:
+                print("Both have blackjacks, it is a tie")
+                self.recordTies()
+            else:
+                print('Dealer Wins')
+                self.recordLosingScores()
+        elif dealerTotal > userTotal:
+            print('You lose')
+            self.recordLosingScores()
+        elif dealerTotal < userTotal:
+            print('You win')
+            self.recordWinningScores()
+    def recordWinningScores(self):
+        f = open("scores.txt", "a")
+        f.write("Win\n")
+        f.close()
+    def recordLosingScores(self):
+        f = open("scores.txt", "a")
+        f.write("Lose\n")
+        f.close()
+    def recordTies(self):
+        f = open("scores.txt", "a")
+        f.write("Tie\n")
+        f.close()
 game = BlackjackGame()
 game.deal()
 print ('The dealer has ' , game.getDealerCards())
 
 print('Your cards:', game.getUserCards())
 print('Your total is' , game.getUserScore())
-if game.getUserScore() == 21:
-    print('Blackjack')
+
 print("Do you want to hit or stay?(H/S)")
 play = input().upper()
 #player playing
@@ -117,4 +150,7 @@ if play == "S":
     print('Now it is the dealers turn')
     game.stay()
 
-#determine who wins
+checkScores = input('Do you want to check your playing history?(Y/N)')
+if checkScores == "Y":
+    f = open("scores.txt", "r")
+    print(f.read())
