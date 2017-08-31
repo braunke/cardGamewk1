@@ -161,6 +161,7 @@ while playOn == True:
             play = "S"
         elif userTotal > 21:
             print('bust! Game Over')
+            game.recordLosingScores()
             play = "x"
 
     if play == "S":
