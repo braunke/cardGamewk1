@@ -21,7 +21,6 @@ ace = Card(1, "Ace")
 #class for the game
 class BlackjackGame(object):
 
-    #creates deck of cards
     def __init__(self):
         cards = [jack, queen, two, three, four, five, six, seven, eight, nine, ten, ace]
         self.cardDeck = cards + cards + cards + cards
@@ -47,6 +46,7 @@ class BlackjackGame(object):
     def getDealerScore (self):
         return self.getScore(self.dealerCards)
     #gets the cards the players have
+    #used this stackoverflow code to find out how to get the index https://stackoverflow.com/questions/522563/accessing-the-index-in-python-for-loops
     def getCards (self, cards, showHidden):
         cardList = ""
         for idx, card in enumerate(cards):
@@ -85,12 +85,12 @@ class BlackjackGame(object):
                     print('You win')
                     self.recordWinningScores()
                     dealerPlay = "X"
-                elif dealerTotal > 17:
+                elif dealerTotal >= 17:
                     print("Dealer total is", dealerTotal)
                     dealerPlay = "X"
                     self.winner()
 
-        elif dealerTotal > 17:
+        elif dealerTotal >= 17:
             print('The dealers total is', dealerTotal)
             self.winner()
         elif dealerTotal == 21:
